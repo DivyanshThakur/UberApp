@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +20,10 @@ import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
+
+import java.util.zip.Inflater;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,7 +39,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this,"Welcome user",Toast.LENGTH_SHORT).show();
 
                             user.put("as", edtDriverOrPassenger.getText().toString());
-                            user.saveInBackground();
+                            user.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e == null) {
+                                        transitionToPassengerActivity();
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -59,8 +71,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         if (ParseUser.getCurrentUser() != null) {
             // Intent activity
+
+            transitionToPassengerActivity();
         }
 
         // Save the current Installation to Back4App
@@ -86,10 +102,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 if (state == State.SIGNUP) {
 
-                    if (driverRadioButton.isChecked() == false || passengerRadioButton.isChecked() == false) {
+                    if (driverRadioButton.isChecked() == false && passengerRadioButton.isChecked() == false) {
                         Toast.makeText(MainActivity.this,"Are you a Passenger or Driver?",Toast.LENGTH_LONG).show();
                         return;
                     }
+
+                    final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.setMessage("Signing Up");
+                    progressDialog.show();
 
                     ParseUser appUser = new ParseUser();
                     appUser.setUsername(edtUsername.getText().toString());
@@ -106,17 +126,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         public void done(ParseException e) {
                             if (e == null) {
                                 Toast.makeText(MainActivity.this, "Signed Up!",Toast.LENGTH_SHORT).show();
+                                transitionToPassengerActivity();
                             }
+                            progressDialog.dismiss();
                         }
                     });
 
                 } else if (state == State.LOGIN) {
+                    final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+                    progressDialog.setMessage("Logging in...");
+                    progressDialog.show();
+
                     ParseUser.logInInBackground(edtUsername.getText().toString(), edtPassword.getText().toString(), new LogInCallback() {
                         @Override
                         public void done(ParseUser user, ParseException e) {
                             if (user != null && e == null) {
                                 Toast.makeText(MainActivity.this,"User Logged in",Toast.LENGTH_SHORT).show();
+                                transitionToPassengerActivity();
                             }
+                            progressDialog.dismiss();
                         }
                     });
                 }
@@ -151,5 +179,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void transitionToPassengerActivity() {
+        if (ParseUser.getCurrentUser() != null) {
+            if (ParseUser.getCurrentUser().get("as").equals("Passenger")) {
+                Intent intent = new Intent(MainActivity.this, PassengerActivity.class);
+                startActivity(intent);
+            }
+        }
     }
 }
