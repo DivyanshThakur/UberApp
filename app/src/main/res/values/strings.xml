@@ -4,8 +4,8 @@
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
 
     <!-- Change the following strings as required -->
-    <string name="back4app_app_id">Y1CfxbdHnOQeYVzMFmsMGOv5ydQb8c8oyiHFzb6v</string>
-    <string name="back4app_client_key">QA91eiKyZ6ccoa1c2ZqUN3ajv48j1hhwDSaaLwEy</string>
+    <string name="back4app_app_id">uKuZxxuX7CaWcUHC6kFlkQAOAQMueI99IBLtnB3u</string>
+    <string name="back4app_client_key">SO62ymMfB3KzS9rolgs1m1YtLQJf6FT1u8JtxSoq</string>
     <string name="title_activity_passenger">Passenger</string>
 
 </resources>

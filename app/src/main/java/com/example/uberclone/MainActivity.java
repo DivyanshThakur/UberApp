@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.google.android.gms.dynamic.IFragmentWrapper;
 import com.parse.LogInCallback;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 public void done(ParseException e) {
                                     if (e == null) {
                                         transitionToPassengerActivity();
+                                        transitionToDriverRequestListActivity();
                                     }
                                 }
                             });
@@ -75,8 +77,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (ParseUser.getCurrentUser() != null) {
             // Intent activity
-
             transitionToPassengerActivity();
+            transitionToDriverRequestListActivity();
         }
 
         // Save the current Installation to Back4App
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (e == null) {
                                 Toast.makeText(MainActivity.this, "Signed Up!",Toast.LENGTH_SHORT).show();
                                 transitionToPassengerActivity();
+                                transitionToDriverRequestListActivity();
                             }
                             progressDialog.dismiss();
                         }
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (user != null && e == null) {
                                 Toast.makeText(MainActivity.this,"User Logged in",Toast.LENGTH_SHORT).show();
                                 transitionToPassengerActivity();
+                                transitionToDriverRequestListActivity();
                             }
                             progressDialog.dismiss();
                         }
@@ -185,6 +189,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ParseUser.getCurrentUser() != null) {
             if (ParseUser.getCurrentUser().get("as").equals("Passenger")) {
                 Intent intent = new Intent(MainActivity.this, PassengerActivity.class);
+                startActivity(intent);
+            }
+        }
+    }
+
+    private void transitionToDriverRequestListActivity() {
+        if (ParseUser.getCurrentUser() != null) {
+            if (ParseUser.getCurrentUser().get("as").equals("Driver")) {
+
+                Intent intent = new Intent(this, DriverRequestListActivity.class);
                 startActivity(intent);
             }
         }

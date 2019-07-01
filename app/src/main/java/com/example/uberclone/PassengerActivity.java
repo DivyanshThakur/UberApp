@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
+import com.parse.LogOutCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -60,9 +61,22 @@ public class PassengerActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (objects != null && e == null) {
-                    isRequestCancelled = true;
-                    btnBookCar.setText("Cancel the Uber order");
+                        btnBookCar.setText("Cancel the Uber order");
+                        isRequestCancelled = true;
                 }
+            }
+        });
+
+        findViewById(R.id.btnLogOut).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ParseUser.logOutInBackground(new LogOutCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        finish();
+                    }
+                });
+
             }
         });
     }
@@ -107,9 +121,7 @@ public class PassengerActivity extends FragmentActivity implements OnMapReadyCal
             }
         };
 
-       if (Build.VERSION.SDK_INT < 23) {
-           locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
-       } else if (Build.VERSION.SDK_INT >= 23) {
+       if (Build.VERSION.SDK_INT >= 23) {
            if (ContextCompat.checkSelfPermission(PassengerActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                ActivityCompat.requestPermissions(PassengerActivity.this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
@@ -118,6 +130,8 @@ public class PassengerActivity extends FragmentActivity implements OnMapReadyCal
                Location currentPassengerLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                updatePassengerCameraLocation(currentPassengerLocation);
            }
+       } else if (Build.VERSION.SDK_INT < 23) {
+           locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
        }
     }
 
@@ -144,7 +158,7 @@ public class PassengerActivity extends FragmentActivity implements OnMapReadyCal
             mMap.addMarker(new MarkerOptions().position(passengerLocation).title("Your location"));
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(PassengerActivity.this,"Please turn ON your location",Toast.LENGTH_LONG).show();
+            Toast.makeText(PassengerActivity.this,"Unknown error",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -194,7 +208,7 @@ public class PassengerActivity extends FragmentActivity implements OnMapReadyCal
                                 @Override
                                 public void done(ParseException e) {
                                     if (e == null) {
-                                        Toast.makeText(PassengerActivity.this,"REQUEST/s DELETED!",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(PassengerActivity.this,"Request/s deleted!",Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
