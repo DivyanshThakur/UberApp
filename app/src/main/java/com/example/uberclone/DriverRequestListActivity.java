@@ -50,6 +50,8 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
     private ArrayList<Double> passengersLatitudes;
     private ArrayList<Double> passengersLongitudes;
 
+    private ArrayList<String> requestCarUsernames;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +63,7 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
 
         passengersLatitudes = new ArrayList<>();
         passengersLongitudes = new ArrayList<>();
+        requestCarUsernames = new ArrayList<>();
 
 
         try {
@@ -161,6 +164,7 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
 
             ParseQuery<ParseObject> requestCarQuery = ParseQuery.getQuery("RequestCar");
             requestCarQuery.whereNear("passengerLocation", currentDriverLocation);
+            requestCarQuery.whereDoesNotExist("driverOfMe");
             requestCarQuery.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> objects, ParseException e) {
@@ -178,6 +182,9 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
                             if (passengersLongitudes.size() > 0) {
                                 passengersLongitudes.clear();
                             }
+                            if (requestCarUsernames.size() > 0) {
+                                requestCarUsernames.clear();
+                            }
 
 
                             for (ParseObject nearRequests : objects) {
@@ -192,6 +199,8 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
 
                                 passengersLatitudes.add(pLocation.getLatitude());
                                 passengersLongitudes.add(pLocation.getLongitude());
+
+                                requestCarUsernames.add(nearRequests.get("username") + "");
                             }
 
                         } else {
@@ -232,6 +241,7 @@ public class DriverRequestListActivity extends AppCompatActivity implements View
                 intent.putExtra("dLongitude", dLocation.getLongitude());
                 intent.putExtra("pLatitude", passengersLatitudes.get(i));
                 intent.putExtra("pLongitude", passengersLongitudes.get(i));
+                intent.putExtra("rUsername", requestCarUsernames.get(i));
 
                 startActivity(intent);
 
